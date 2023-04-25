@@ -2,8 +2,8 @@
   
 This plays on assumption that you already know how to register and approve an app in AAD.
 - Created a sample application called `au-jml-securemodel`
-- <insert fudged information contain fake requisite details later.>
-- <used certificate from my website and created a shared secret then documented both.>
+- *insert fudged information contain fake requisite details later.*
+- Used `certificate` from my website and created a shared `secret` then `documented` both for later usage
 
 # 1. PERMISSIONS
 
