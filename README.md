@@ -1,4 +1,6 @@
 `Starting with Sample - ability to create / delete / modify users in Exchange Online , AzAD , Graph /// MS365. ` 
+  
+This plays on assumption that you already know how to register and approve an app in AAD.
 
 
 # 1. PERMISSIONS
