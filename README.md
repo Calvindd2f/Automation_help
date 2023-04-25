@@ -168,5 +168,142 @@ Here are templates for each, I'd advise customizing them to your setting.
             "kind": "functionapp",
             "identity": {
                 "type": "SystemAssigned"
+                "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('functionAppServicePlanName'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value, ';EndpointSuffix=core.windows.net')]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~4"
+                        },
+                        {
+                            "name": "WEBSITE_RUN_FROM_PACKAGE",
+                            "value": "[concat('https://', variables('functionAppPackageStorageAccountName'), '.blob.core.windows.net/', variables('functionAppPackageContainerName'), '/', variables('functionAppPackageName'), '.zip')]"
+                        },
+                        {
+                            "name": "KeyVaultName",
+                            "value": "[parameters('keyVaultName')]"
+                        },
+                        {
+                            "name": "ApplicationId",
+                            "value": "[parameters('applicationId')]"
+                        }
+                    ]
+                },
+                "identity": {
+                    "type": "SystemAssigned"
+                },
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value, ';EndpointSuffix=core.windows.net')]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~4"
+                        },
+                        {
+                            "name": "WEBSITE_RUN_FROM_PACKAGE",
+                            "value": "[concat('https://', variables('functionAppPackageStorageAccountName'), '.blob.core.windows.net/', variables('functionAppPackageContainerName'), '/', variables('functionAppPackageName'), '.zip')]"
+                        },
+                        {
+                            "name": "KeyVaultName",
+                            "value": "[parameters('keyVaultName')]"
+                        },
+                        {
+                            "name": "ApplicationId",
+                            "value": "[parameters('applicationId')]"
+                        }
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[resourceId('Microsoft.Web/serverfarms', variables('functionAppServicePlanName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2021-02-01",
+            "name": "[concat(parameters('appName'), '/RenewRefreshToken')]",
+            "properties": {
+                "scriptFile": "RenewRefreshToken/index.js",
+                "bindings": [
+                    {
+                        "name": "myTimer",
+                        "type": "timerTrigger",
+                        "direction": "in",
+                        "schedule": "0 0 0 * * 1"
+                    }
+                ],
+                "appSettings": [
+                    {
+                        "name": "KeyVaultUri",
+                        "value": "[concat('https://', parameters('keyVaultName'), '.vault.azure.net')]"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('appName'))]"
+            ]
+        }
+    ],
+    "variables": {
+        "functionAppServicePlanName": "[concat('fn-plan-', uniqueString(resourceGroup().id))]",
+        "storageAccountName":
+                "[concat('stg', uniqueString(resourceGroup().id))]",
+        "functionAppPackageStorageAccountName": "[concat('stg', uniqueString(resourceGroup().id))]",
+        "functionAppPackageContainerName": "function-packages",
+        "functionAppPackageName": "RenewRefreshToken"
+    }
+}
+```
+  
+    
+Sample code of 'RefreshTokenCode' using Javascript and Node.js runtime...  
+```javascript
+const { DefaultAzureCredential } = require("@azure/identity");
+const { SecretClient } = require("@azure/keyvault-secrets");
+const { ClientSecretCredential } = require("@azure/identity");
+const { ConfidentialClientApplication } = require("@azure/msal-node");
+
+module.exports = async function (context, myTimer) {
+    var timeStamp = new Date().toISOString();
+
+    if (myTimer.IsPastDue)
+    {
+        context.log('JavaScript is running late!');
+    }
+    context.log('JavaScript timer trigger function ran!', timeStamp);   
+    
+    const keyVaultUri = process.env.KeyVaultUri;
+    const clientSecretName = "myClientSecret";
+    const credential = new DefaultAzureCredential();
+    const secretClient = new SecretClient(keyVaultUri, credential);
+    const clientSecret = await secretClient.getSecret(clientSecretName);
+    
+    const clientId = "myClientId";
+    const tenantId = "myTenantId";
+    const scope = ["https://graph.microsoft.com/.default"];
+
+    const msalConfig = {
+        auth: {
+            clientId: clientId,
+            authority: `https://login.microsoftonline.com/${tenantId}`
+        }
+    };
+    const cca = new ConfidentialClientApplication(msalConfig);
+    const clientCredential = new ClientSecretCredential(tenantId, clientId, clientSecret.value);
+    await cca.acquireTokenSilent({
+        scopes: scope,
+        account: null,
+        forceRefresh: false
+    });
+};
 
 ```
