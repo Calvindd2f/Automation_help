@@ -42,6 +42,8 @@ This plays on assumption that you already know how to register and approve an ap
     **MailboxSettings.ReadWrite**: Allows the application to update mailbox settings, such as converting a user mailbox to a shared mailbox.  
     **LicenseManagement.ReadWrite.All**: Allows the application to grant or revoke licenses for all users in the organization.  
 
+`Granted the API permissions for the application.`  
+
 
 # 2. CHOOSE A TOKEN FLOW:  
   
@@ -55,8 +57,37 @@ This plays on assumption that you already know how to register and approve an ap
   
 `Device Code Flow:` This flow is used when an application needs to authenticate a user on a device that does not have a web browser, such as a smart TV or gaming console. The user is prompted to enter a device code on a separate device with a web browser, and then signs in and consents to the application's requested permissions. The access token is then returned to the original device.  
   
-# 3. TOKEN RENEWAL / LONGEVITY  
+---------------------------------------------------------------------------------------------------------------
+    
+  `Client Credentials Flow` was chosen. This is retrieving an access token from a shared secret. Here is an example of the HTTP request and response ; along with the required paramters.
   
+  
+```HTTP
+POST /{tenant}/oauth2/v2.0/token HTTP/1.1           //Line breaks for clarity
+Host: login.microsoftonline.com:443
+Content-Type: application/x-www-form-urlencoded
+
+client_id=535fb089-9ff3-47b6-9bfb-4f1264799865
+&scope=https%3A%2F%2Fgraph.microsoft.com%2F.default
+&client_secret=sampleCredentia1s
+&grant_type=client_credentials
+```  
+or
+```bash
+curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d 'client_id=<>&scope=https%3A%2F%2Fgraph.microsoft.com%2F.default&client_secret=<>&grant_type=client_credential' 'https://login.microsoftonline.com/<>/oauth2/v2.0/token'
+```  
+  
+`tenant`  - target directory.  
+`client_id`  - Apps id.  
+`scope`  - resource identifier (application ID URI) of the resource you want, affixed with the .default suffix. For the Microsoft Graph example, the value is https://graph.microsoft.com/.default.  
+`client_secret`  - Secret  
+`grant_type`  - must be set to `client_credentials`  
+  
+  
+
+
+# 3. TOKEN RENEWAL / LONGEVITY  
+ 
 In this document , I will use my preferred way to automate the refresh token without just creating an inital token that does not expire / expires in a very long time.       
   
   
