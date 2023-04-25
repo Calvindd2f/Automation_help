@@ -1,7 +1,8 @@
 `Starting with Sample - ability to create / delete / modify users in Exchange Online , AzAD , Graph /// MS365. ` 
   
 This plays on assumption that you already know how to register and approve an app in AAD.
-
+- Create a sample application called `au-jml-securemodel`
+- 
 
 # 1. PERMISSIONS
 
