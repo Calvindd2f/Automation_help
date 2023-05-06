@@ -1,22 +1,21 @@
-<#┌────────────────────────────────────────────────────────┐
+<#  ┌────────────────────────────────────────────────────────┐
     │ Calvindd2fs SIMPLIFIED Az APPLICATION                  │
     │ VERSION 2.1 - Released May 5, 2023                     │
-    │ LICENSE RESTRICTIONS APPLY - <link_to_repo>            │
-└────────────────────────────────────────────────────────┘#>
+    │ LICENSE RESTRICTIONS APPLY -                           │
+    └────────────────────────────────────────────────────────┘  #>
 
 # The permission User.ReadWrite.All is optional in the list of permissions defined in the variable $permissionList. 
-# User.ReadWrite.All may be removed, but users or admins will not be able to update Office 365 details from within application.
-calvin@
+# User.ReadWrite.All may be removed, but all will not be able to update Office 365 details from within app (self service)
 
-$domain = 'wxgbh.onmicrosoft.com'
+$domain = 'calvindd2f.ie'
 $database = 'cpaq-it'
 $permissionList = 'SecurityEvents.Read.All Directory.Read.All Domain.Read.All Reports.Read.All User.Read.All User.ReadWrite.All Calendars.Read AuditLog.Read.All ServiceMessage.Read.All ServiceHealth.Read.All'
-$applicationName = 'Not an azure service bus ; [not A ] - Partner Application'
+$applicationName = 'Potentially a Partner Application, definitely a Application'
 $homePage = 'https://' + $domain
 $appIdURL = 'https://' + $domain + "/$((New-Guid).ToString())"
 $logoutURL = 'https://portal.office.com'
 
-# Special thanks to GCITS for providing code and examples for these functions. https://github.com/GCITS, https://gcits.com
+# registering service principals , add resource permissions for appkeys , checking for modules.
 
 Function Confirm-MicrosoftGraphServicePrincipal 
 {
@@ -162,9 +161,9 @@ Function Verify-Modules
 
  
 Write-Host -Object '┌────────────────────────────────────────────────────────┐'
-Write-Host -Object '│ Calvindd2fs SIMPLIFIED Az APPLICATION                  │'
+Write-Host -Object '│ Calvindd2fs               Az applcation                │'
 Write-Host -Object '│ VERSION 2.1 - Released May 5, 2023                     │'
-Write-Host -Object '│ LICENSE RESTRICTIONS APPLY - <link_to_repo>            │'
+Write-Host -Object '│ LICENSE RESTRICTIONS -                                 │'
 Write-Host -Object '└────────────────────────────────────────────────────────┘'
 Write-Host -Object ''
 Write-Host -Object 'Instructions' -ForegroundColor Green
@@ -204,6 +203,8 @@ if ($success -eq $True)
 else 
 {
   Write-Error -Message 'Rerun this script as an administrator to install the required modules.'
+  # `exit` 
+  # > above was removed for interoperability but also modularity.
 }
 
 if ($success -eq $True) 
