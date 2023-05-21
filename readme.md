@@ -1,3 +1,5 @@
+# Repo archived. Contents moved into Calvindd2f\Proactive-Issues. This version will not be updated.   Files that assist with Automations I make - the start will predominantly be 365
+
 The two directories are more psudocode mixed with real code as a readme.   
 below is `Application.ps1` contents.  
 
